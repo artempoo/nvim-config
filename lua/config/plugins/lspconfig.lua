@@ -32,10 +32,43 @@ return {
 					capabilities = capabilities,
 				})
 			end,
+			["emmet_ls"] = function()
+				nvim_lsp["emmet_ls"].setup({
+					capabilities = capabilities,
+					filetypes = {
+						"html",
+						"typescriptreact",
+						"javascriptreact",
+						"css",
+						"sass",
+						"scss",
+						"less",
+						"svelte",
+						"jsx",
+						"tsx",
+					},
+				})
+			end,
+			-- ["phpactor"] = function()
+			-- 	nvim_lsp["phpactor"].setup({
+			-- 		on_attach = on_attach,
+			-- 		capabilities = capabilities,
+			-- 	})
+			-- end,
 			["ts_ls"] = function()
 				nvim_lsp["ts_ls"].setup({
 					on_attach = on_attach,
-					--filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+					filetypes = {
+						"typescript",
+						".js",
+						"js",
+						"javascriptreact",
+						"javascript.js",
+						"javascript",
+						"javascript.jsx",
+						"typescriptreact",
+						"typescript.tsx",
+					},
 					capabilities = capabilities,
 				})
 			end,

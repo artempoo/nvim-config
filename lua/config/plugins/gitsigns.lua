@@ -7,7 +7,7 @@ return {
 		config = function()
 			local gitsigns = require("gitsigns")
 			gitsigns.setup({})
-			-- vim.keymap.set("n", "<leader>gp", ":Gitsigns preview_hunk<CR>", {})
+			-- vim.keymap.set("n", "<leader>gl", ":Gitsigns preview_hunk<CR>", {})
 		end,
 	},
 }

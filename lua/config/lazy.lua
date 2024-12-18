@@ -26,25 +26,25 @@ require("lazy").setup("config.plugins")
 require("catppuccin").setup({
 	flavour = "auto", -- latte, frappe, macchiato, mocha
 	background = { -- :h background
-		light = "latte",
+		light = "auto",
 		dark = "mocha",
 	},
 	transparent_background = true, -- disables setting the background color.
 	show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
-	term_colors = false, -- sets terminal colors (e.g. `g:terminal_color_0`)
+	term_colors = true, -- sets terminal colors (e.g. `g:terminal_color_0`)
 	dim_inactive = {
 		enabled = false, -- dims the background color of inactive window
 		shade = "dark",
 		percentage = 0.15, -- percentage of the shade to apply to the inactive window
 	},
-	no_italic = false, -- Force no italic
-	no_bold = false, -- Force no bold
+	no_italic = true, -- Force no italic
+	no_bold = true, -- Force no bold
 	no_underline = false, -- Force no underline
 	styles = { -- Handles the styles of general hi groups (see `:h highlight-args`):
 		comments = { "italic" }, -- Change the style of comments
 		conditionals = { "italic" },
 		loops = {},
-		functions = {},
+		functions = { "bold" },
 		keywords = {},
 		strings = {},
 		variables = {},
@@ -77,4 +77,12 @@ vim.cmd.colorscheme("catppuccin")
 
 require("ibl").setup()
 require("Comment").setup()
--- require("react-extract").setup()
+require("live-server").setup()
+
+require("cmp").setup({
+	sources = {
+		{ name = "nvim_lsp" },
+	},
+})
+
+require("cmp_nvim_lsp").setup()
