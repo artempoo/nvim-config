@@ -72,6 +72,16 @@ return {
 					capabilities = capabilities,
 				})
 			end,
+			["clangd"] = function()
+				nvim_lsp["clangd"].setup({
+					on_attach = on_attach,
+					filetypes = {
+						"c",
+						"h",
+					},
+					capabilities = capabilities,
+				})
+			end,
 			["cssls"] = function()
 				nvim_lsp["cssls"].setup({
 					on_attach = on_attach,
