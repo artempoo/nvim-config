@@ -156,7 +156,6 @@ require("rose-pine").setup({
 
 vim.cmd("colorscheme rose-pine")
 
-require("ibl").setup()
 require("Comment").setup()
 require("live-server").setup()
 --
@@ -166,3 +165,5 @@ require("cmp").setup({
 	},
 })
 require("cmp_nvim_lsp").setup()
+
+require("ibl").setup({})
