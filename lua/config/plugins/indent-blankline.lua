@@ -5,3 +5,4 @@ return {
 	---@type ibl.config
 	opts = {},
 }
+-- подсказки по отсупам
