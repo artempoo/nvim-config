@@ -53,6 +53,13 @@ return {
 			-- 	nvim_lsp["phpactor"].setup({
 			-- 		on_attach = on_attach,
 			-- 		capabilities = capabilities,
+			-- 		default_config = {
+			-- 			cmd = { "phpactor", "language-server", "-vvv" },
+			-- 			filetypes = { "php" },
+			-- 			root_dir = function()
+			-- 				return vim.fn.expand("%:p:h")
+			-- 			end,
+			-- 		},
 			-- 	})
 			-- end,
 			["ts_ls"] = function()
