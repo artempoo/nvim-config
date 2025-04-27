@@ -167,3 +167,4 @@ require("cmp").setup({
 require("cmp_nvim_lsp").setup()
 
 require("ibl").setup({})
+-- require("lspconfig").nasm_lsp.setup({})

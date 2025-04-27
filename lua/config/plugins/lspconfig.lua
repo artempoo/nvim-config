@@ -83,8 +83,8 @@ return {
 				nvim_lsp["clangd"].setup({
 					on_attach = on_attach,
 					filetypes = {
-						"c",
-						"h",
+						".c",
+						".h",
 					},
 					capabilities = capabilities,
 				})

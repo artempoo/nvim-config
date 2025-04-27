@@ -2,7 +2,8 @@ vim.g.mapleader = " "
 
 --NeoTree
 vim.keymap.set("n", "<leader>e", ":Neotree float<CR>")
--- vim.keymap.set("n", "<leader>stv", ":vsplit +term<CR>")
+vim.keymap.set("n", "<leader>sp", ":vsplit<CR>")
+vim.keymap.set("n", "<leader>on", ":only<CR>")
 vim.keymap.set("n", "<leader>fr", ":%s/")
 vim.keymap.set("n", "<leader>ls", ":LiveServerStart<CR>")
 vim.keymap.set("n", "<leader>lt", ":LiveServerStop<CR>")

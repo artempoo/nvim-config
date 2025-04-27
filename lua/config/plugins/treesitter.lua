@@ -46,28 +46,24 @@ return {
 				"php",
 				"python",
 				"sql",
+				"asm", -- Общий ассемблер (GAS, NASM)
+				-- "nasm",     -- Если используете NASM (раскомментируйте)
+				-- "masm",     -- Если используете MASM (раскомментируйте)
 			},
 			auto_install = true,
 			sync_install = false,
-			-- incremental_selection = {
-			--     enable = true,
-			--     keymaps = {
-			--         init_selection = "<C-space>",
-			--         node_incremental = "<C-space>",
-			--         scope_incremental = false,
-			--         node_decremental = "<bs>",
-			--     },
-			-- },
-			-- rainbow = {
-			--     enable = true,
-			--     disable = { "html" },
-			--     extended_mode = false,
-			--     max_file_lines = nil,
-			-- },
 			context_commentstring = {
 				enable = true,
 				enable_autocmd = false,
 			},
+		})
+
+		-- Автоматически устанавливаем filetype для .asm и .s файлов
+		vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+			pattern = { "*.asm", "*.s", "*.inc" },
+			callback = function()
+				vim.bo.filetype = "asm" -- или "nasm", если используете NASM
+			end,
 		})
 	end,
 }
