@@ -47,8 +47,8 @@ return {
 				"python",
 				"sql",
 				"asm", -- Общий ассемблер (GAS, NASM)
-				-- "nasm",     -- Если используете NASM (раскомментируйте)
-				-- "masm",     -- Если используете MASM (раскомментируйте)
+				"nasm", -- Если используете NASM (раскомментируйте)
+				"masm", -- Если используете MASM (раскомментируйте)
 			},
 			auto_install = true,
 			sync_install = false,
@@ -59,11 +59,11 @@ return {
 		})
 
 		-- Автоматически устанавливаем filetype для .asm и .s файлов
-		-- vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-		-- 	pattern = { "*.asm", "*.s", "*.inc" },
-		-- 	callback = function()
-		-- 		vim.bo.filetype = "asm" -- или "nasm", если используете NASM
-		-- 	end,
-		-- })
+		vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+			pattern = { "*.asm", "*.s", "*.inc" },
+			callback = function()
+				vim.bo.filetype = "asm" -- или "nasm", если используете NASM
+			end,
+		})
 	end,
 }

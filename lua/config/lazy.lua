@@ -22,7 +22,7 @@ vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
 require("lazy").setup("config.plugins")
---
+
 -- require("catppuccin").setup({
 -- 	flavour = "auto", -- latte, frappe, macchiato, mocha
 -- 	background = { -- :h background
@@ -167,4 +167,4 @@ require("cmp").setup({
 require("cmp_nvim_lsp").setup()
 
 require("ibl").setup({})
--- require("lspconfig").nasm_lsp.setup({})
+require("lspconfig").nasm_lsp.setup({})
