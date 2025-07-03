@@ -31,7 +31,6 @@ o.wrap = false -- Disable line wrap
 o.autoindent = true
 o.title = true
 o.showmatch = true
-o.termguicolors = true
 o.clipboard = "unnamedplus" -- использование системного буфера
 o.sessionoptions = { "buffers", "curdir", "tabpages", "winsize" }
 
@@ -54,8 +53,6 @@ o.sessionoptions = { "buffers", "curdir", "tabpages", "winsize" }
 -- "n-v-c:block,i-ci-ve:ver25,r-cr:hor20,o:hor50,a:blinkwait700-blinkoff400-blinkon250-Cursor/lCursor,sm:block-blinkwait175-blinkoff150-blinkon175"
 
 -- vim.opt.guicursor = "n:ver1,v:ver1,i:ver1,i:blinkwait1-blinkoff50-blinkon175"
-
-o.shiftround = true -- Round indent
 
 -- Fix markdown indentation settings
 vim.g.markdown_recommended_style = 0

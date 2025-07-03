@@ -1,13 +1,11 @@
 return {
-	{
-		"Isrothy/neominimap.nvim",
-		config = function()
-			require("neominimap").setup({
-				-- Здесь можно указать настройки (опционально)
-				-- Например:
-				-- hl_group = "Visual",
-				-- update_delay = 100,
-			})
-		end,
-	},
+	"Isrothy/neominimap.nvim",
+	config = function()
+		require("neominimap").setup({
+			-- Здесь можно указать настройки (опционально)
+			-- Например:
+			-- hl_group = "Visual",
+			-- update_delay = 100,
+		})
+	end,
 }

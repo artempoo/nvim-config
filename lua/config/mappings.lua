@@ -1,5 +1,3 @@
-vim.g.mapleader = " "
-
 --NeoTree
 vim.keymap.set("n", "<leader>e", ":Neotree float<CR>")
 vim.keymap.set("n", "<leader>sp", ":vsplit<CR>")
@@ -44,3 +42,25 @@ vim.keymap.set("n", "<Leader>di", function()
 	require("dap").disconnect() -- Остановить отладчик + закрыть сессию
 	require("dapui").close() -- Закрыть интерфейс
 end, { desc = "[D]ebug [I]nterrupt" })
+
+-- LSP маппинги
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "Go to references" })
+vim.keymap.set("n", "K", vim.lsp.buf.hover, { desc = "Hover documentation" })
+vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename symbol" })
+vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code action" })
+vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+
+-- Автодополнение
+vim.keymap.set("i", "<C-Space>", "<cmd>lua require('cmp').complete()<CR>", { desc = "Trigger completion" })
+
+-- Поиск документации в браузере
+vim.keymap.set("n", "<leader>ts", function()
+	local word = vim.fn.expand("<cword>")
+	local url = "https://learn.javascript.ru/search?query=" .. word
+	vim.fn.system("open '" .. url .. "'")
+end, { desc = "Search learn.javascript.ru documentation" })
+
+

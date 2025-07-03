@@ -4,6 +4,8 @@ return {
 	dependencies = "nvim-tree/nvim-web-devicons",
 	config = function()
 		vim.opt.termguicolors = true
+		
+		-- Маппинги для управления буферами
 		vim.api.nvim_set_keymap("n", "<TAB>l", ":BufferLineCloseLeft<CR>", { noremap = true, silent = true })
 		vim.api.nvim_set_keymap("n", "<TAB>r", ":BufferLineCloseRight<CR>", { noremap = true, silent = true })
 		vim.api.nvim_set_keymap("n", "<TAB>q", ":bd<CR>", { noremap = true, silent = true })

@@ -1,0 +1,46 @@
+return {
+	"AlexvZyl/nordic.nvim",
+	lazy = false,
+	priority = 1000,
+	config = function()
+		require("nordic").setup({
+			on_palette = function(palette)
+				-- Цвета из Kitty
+				palette.black0 = "#292724"
+				palette.red = { base = "#816f4b", bright = "#f29d63" }
+				palette.green = { base = "#ec9255", dim = "#3d3a34" }
+				palette.yellow = { base = "#ffb380", dim = "#615c51" }
+				palette.blue = { base = "#957e50", dim = "#908774" }
+				palette.magenta = { base = "#ec9255", dim = "#ddcba6" }
+				palette.cyan = { base = "#ac8e53", dim = "#e58748" }
+				palette.white0 = "#ada594"
+				palette.white1 = "#f2ead9"
+
+				palette.bg = palette.black0
+				palette.fg = palette.white0
+			end,
+
+			after_palette = function(palette)
+				local U = require("nordic.utils")
+
+				-- Контрастное выделение — смешиваем оранжевый с фоном
+				-- palette.bg_visual = U.blend("#ec9255", palette.bg, 0.45)
+			end,
+
+			on_highlight = function(highlights, palette)
+				highlights.Visual = {
+					bg = "#ada594",
+					fg = "#3d3a34",
+					bold = true,
+				}
+			end,
+
+			transparent = {
+				bg = true, -- лучше включить после проверки
+				float = true,
+			},
+		})
+
+		vim.cmd.colorscheme("nordic")
+	end,
+}

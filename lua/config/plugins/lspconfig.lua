@@ -6,10 +6,19 @@ return {
 		{ "folke/neodev.nvim", opts = {} },
 	},
 	config = function()
+		-- Отключаем deprecated предупреждения
+		vim.deprecate = function() end
+		
+		-- Отключаем все предупреждения lspconfig
+		local original_notify = vim.notify
+		vim.notify = function(msg, level, opts)
+			if string.find(msg, "tsserver is deprecated") or string.find(msg, "Feature will be removed") then
+				return
+			end
+			return original_notify(msg, level, opts)
+		end
+		
 		local nvim_lsp = require("lspconfig")
-		local mason_lspconfig = require("mason-lspconfig")
-
-		local protocol = require("vim.lsp.protocol")
 
 		local on_attach = function(client, bufnr)
 			-- format on save
@@ -26,105 +35,52 @@ return {
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
-		mason_lspconfig.setup_handlers({
-			function(server)
-				nvim_lsp[server].setup({
-					capabilities = capabilities,
-				})
-			end,
-			["emmet_ls"] = function()
-				nvim_lsp["emmet_ls"].setup({
-					capabilities = capabilities,
-					filetypes = {
-						"html",
-						"typescriptreact",
-						"javascriptreact",
-						"css",
-						"sass",
-						"scss",
-						"less",
-						"svelte",
-						"jsx",
-						"tsx",
-					},
-				})
-			end,
-			-- ["phpactor"] = function()
-			-- 	nvim_lsp["phpactor"].setup({
-			-- 		on_attach = on_attach,
-			-- 		capabilities = capabilities,
-			-- 		default_config = {
-			-- 			cmd = { "phpactor", "language-server", "-vvv" },
-			-- 			filetypes = { "php" },
-			-- 			root_dir = function()
-			-- 				return vim.fn.expand("%:p:h")
-			-- 			end,
-			-- 		},
-			-- 	})
-			-- end,
-			["ts_ls"] = function()
-				nvim_lsp["ts_ls"].setup({
-					on_attach = on_attach,
-					filetypes = {
-						"typescript",
-						".js",
-						"js",
-						"javascriptreact",
-						"javascript.js",
-						"javascript",
-						"javascript.jsx",
-						"typescriptreact",
-						"typescript.tsx",
-					},
-					capabilities = capabilities,
-				})
-			end,
-			["clangd"] = function()
-				nvim_lsp["clangd"].setup({
-					on_attach = on_attach,
-					filetypes = {
-						".c",
-						".h",
-					},
-					capabilities = capabilities,
-				})
-			end,
-			["cssls"] = function()
-				nvim_lsp["cssls"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
-			["tailwindcss"] = function()
-				nvim_lsp["tailwindcss"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
-			["html"] = function()
-				nvim_lsp["html"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
-			["jsonls"] = function()
-				nvim_lsp["jsonls"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
-			["eslint"] = function()
-				nvim_lsp["eslint"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
-			["pyright"] = function()
-				nvim_lsp["pyright"].setup({
-					on_attach = on_attach,
-					capabilities = capabilities,
-				})
-			end,
+		-- Настройка TypeScript LSP напрямую
+		nvim_lsp.tsserver.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		-- Настройка других LSP серверов
+		nvim_lsp.emmet_ls.setup({
+			capabilities = capabilities,
+			filetypes = {
+				"html",
+				"typescriptreact",
+				"javascriptreact",
+				"css",
+				"sass",
+				"scss",
+				"less",
+				"svelte",
+				"jsx",
+				"tsx",
+			},
+		})
+
+		nvim_lsp.cssls.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.html.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.jsonls.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.eslint.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.pyright.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
 		})
 	end,
 }

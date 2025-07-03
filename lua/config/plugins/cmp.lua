@@ -4,7 +4,7 @@ return {
 	dependencies = {
 		"hrsh7th/cmp-buffer", -- source for text in buffer
 		"hrsh7th/cmp-path", -- source for file system paths
-		"hrsh7th/cmp-nvim-lsp", -- source for file system paths
+		"hrsh7th/cmp-nvim-lsp", -- source for LSP
 		{
 			"L3MON4D3/LuaSnip",
 			version = "v2.*",
@@ -12,11 +12,9 @@ return {
 			build = "make install_jsregexp",
 		},
 		"rafamadriz/friendly-snippets",
-		"onsails/lspkind.nvim", -- vs-code like pictograms
 	},
 	config = function()
 		local cmp = require("cmp")
-		local lspkind = require("lspkind")
 		local luasnip = require("luasnip")
 
 		require("luasnip.loaders.from_vscode").lazy_load()
@@ -27,27 +25,27 @@ return {
 					luasnip.lsp_expand(args.body)
 				end,
 			},
-			mapping = cmp.mapping.preset.insert({
-				["<C-d>"] = cmp.mapping.scroll_docs(-4),
-				["<C-f>"] = cmp.mapping.scroll_docs(4),
+			mapping = {
 				["<C-Space>"] = cmp.mapping.complete(),
 				["<C-e>"] = cmp.mapping.close(),
-				["<CR>"] = cmp.mapping.confirm({
-					behavior = cmp.ConfirmBehavior.Replace,
-					select = true,
-				}),
-			}),
-			sources = cmp.config.sources({
+				["<CR>"] = cmp.mapping.confirm({ select = true }),
+				
+				-- Навигация по меню
+				["<Tab>"] = cmp.mapping.select_next_item(),
+				["<S-Tab>"] = cmp.mapping.select_prev_item(),
+				["<Down>"] = cmp.mapping.select_next_item(),
+				["<Up>"] = cmp.mapping.select_prev_item(),
+				
+				-- Прокрутка документации
+				["<C-d>"] = cmp.mapping.scroll_docs(-4),
+				["<C-f>"] = cmp.mapping.scroll_docs(4),
+			},
+			sources = {
 				{ name = "nvim_lsp" },
 				{ name = "luasnip" },
 				{ name = "buffer" },
 				{ name = "path" },
-			}),
+			},
 		})
-
-		vim.cmd([[
-      set completeopt=menuone,noinsert,noselect
-      highlight! default link CmpItemKind CmpItemMenuDefault
-    ]])
 	end,
 }
