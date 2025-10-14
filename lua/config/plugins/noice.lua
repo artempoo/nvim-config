@@ -14,9 +14,21 @@ return {
 			messages = {
 				enabled = false, -- Отключаем messages
 			},
+			lsp = {
+				progress = { enabled = false }, -- Глушим LSP progress
+			},
 			popupmenu = {
 				enabled = true,
 				backend = "nui",
+			},
+			routes = {
+				-- Фильтруем любые LSP прогресс-сообщения
+				{ filter = { event = "lsp", kind = "progress" }, opts = { skip = true } },
+				-- Фильтруем шумные уведомления
+				{ filter = { any = {
+					{ find = "validate document" },
+					{ find = "publish diagnostic" },
+				} }, opts = { skip = true } },
 			},
 		})
 

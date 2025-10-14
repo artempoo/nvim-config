@@ -10,6 +10,9 @@ return {
 		require("mason-tool-installer").setup({
 			ensure_installed = {
 				"eslint_d",
+				"rust-analyzer",
+				"rustfmt",
+				"jdtls",
 			},
 		})
 	end,

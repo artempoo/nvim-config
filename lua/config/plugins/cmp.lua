@@ -20,6 +20,11 @@ return {
 		require("luasnip.loaders.from_vscode").lazy_load()
 
 		cmp.setup({
+			preselect = cmp.PreselectMode.Item,
+			completion = {
+				-- показывать список даже без набранных символов (например, сразу после '.')
+				keyword_length = 0,
+			},
 			snippet = {
 				expand = function(args)
 					luasnip.lsp_expand(args.body)
