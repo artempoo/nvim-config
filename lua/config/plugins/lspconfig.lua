@@ -13,6 +13,10 @@ return {
 		local nvim_lsp = require("lspconfig")
 
 		local on_attach = function(client, bufnr)
+			-- защита: если bufnr не число, не вешаем автокоманды
+			if type(bufnr) ~= "number" then
+				return
+			end
 			-- format on save
 			if client.server_capabilities.documentFormattingProvider then
 				vim.api.nvim_create_autocmd("BufWritePre", {
@@ -143,7 +147,9 @@ return {
 					workspace_dir,
 				})
 
-				local jdtls_cap = vim.tbl_deep_extend("force", capabilities, {})
+				-- Вернём snippetSupport в capabilities (нужен для полноценных подсказок),
+				-- но автотрингер мы отключаем на стороне cmp для java.
+				local jdtls_cap = vim.tbl_deep_extend("force", {}, capabilities)
 				local jdtls_cfg = {
 					cmd = cmd,
 					root_dir = project_root,
@@ -166,8 +172,6 @@ return {
 			end,
 		})
 
-		-- Восстанавливаем оригинальный notify после инициализации LSP
-		vim.notify = original_notify
 	end,
 }
 
