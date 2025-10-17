@@ -14,18 +14,20 @@ return {
 
 		local on_attach = function(client, bufnr)
 			-- защита: если bufnr не число, не вешаем автокоманды
-			if type(bufnr) ~= "number" then
-				return
-			end
-			-- format on save
+			if type(bufnr) ~= "number" then return end
+			-- Форматирование по сохранению через LSP: только для C/.h по явному запросу
+			-- Остальные форматы отключены, чтобы не трогать Makefile, .clang-format и т.п.
 			if client.server_capabilities.documentFormattingProvider then
-				vim.api.nvim_create_autocmd("BufWritePre", {
-					group = vim.api.nvim_create_augroup("Format", { clear = true }),
-					buffer = bufnr,
-					callback = function()
-						vim.lsp.buf.format()
-					end,
-				})
+				local ft = vim.bo[bufnr].filetype
+				if ft == "c" or ft == "h" then
+					vim.api.nvim_create_autocmd("BufWritePre", {
+						group = vim.api.nvim_create_augroup("FormatCOnly", { clear = false }),
+						buffer = bufnr,
+						callback = function()
+							vim.lsp.buf.format({ bufnr = bufnr })
+						end,
+					})
+				end
 			end
 		end
 
