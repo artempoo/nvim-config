@@ -40,6 +40,13 @@ return {
 		})
 
 		-- Настройка других LSP серверов
+		nvim_lsp.clangd.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+			filetypes = { "c", "h" },
+			-- cmd = { "clangd", "--background-index" }, -- опционально
+		})
+
 		nvim_lsp.emmet_ls.setup({
 			capabilities = capabilities,
 			filetypes = {

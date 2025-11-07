@@ -13,6 +13,7 @@ return {
 				"rust-analyzer",
 				"rustfmt",
 				"jdtls",
+				"clangd",
 			},
 		})
 	end,
