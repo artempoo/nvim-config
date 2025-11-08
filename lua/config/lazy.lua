@@ -22,4 +22,23 @@ vim.g.maplocalleader = "\\"
 
 -- Setup lazy.nvim
 require("lazy").setup("config.plugins")
-
+-- values shown are defaults and will be used if not provided
+require("gruvbox-material").setup({
+	background = {
+		transparent = true, -- set the background to be opaque
+	},
+	float = {
+		force_background = true, -- set to true to force backgrounds on floats even when
+		-- background.transparent is set
+		background_color = nil, -- set color for float backgrounds. If nil, uses the default color set
+		-- by the color scheme
+	},
+	signs = {
+		force_background = false, -- set to true to force backgrounds on signs even when
+		-- background.transparent is set
+		background_color = nil, -- set color for sign backgrounds. If nil, uses the default color set
+		-- by the color scheme
+	},
+	customize = nil, -- customize the theme in any way you desire, see below what this
+	-- configuration accepts
+})
