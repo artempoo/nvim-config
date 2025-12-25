@@ -15,6 +15,51 @@ return {
 		local on_attach = function(client, bufnr)
 			-- защита: если bufnr не число, не вешаем автокоманды
 			if type(bufnr) ~= "number" then return end
+			
+			-- Отладочная информация для PHP
+			if client.name == "phpactor" then
+				vim.notify("PhpActor LSP подключен для PHP", vim.log.levels.INFO)
+				
+				-- Фильтрация диагностики для WordPress через автокоманду
+				vim.api.nvim_create_autocmd("DiagnosticChanged", {
+					buffer = bufnr,
+					callback = function()
+						local diagnostics = vim.diagnostic.get(bufnr, { client_id = client.id })
+						if #diagnostics == 0 then return end
+						
+						local wp_patterns = {
+							"wp_", "get_", "the_", "is_", "has_", "add_", "remove_", "update_",
+							"register_", "unregister_", "do_", "apply_", "WP_", "ABSPATH",
+						}
+						
+						local filtered = {}
+						for _, diag in ipairs(diagnostics) do
+							local should_filter = false
+							if diag.message then
+								local msg_lower = diag.message:lower()
+								-- Фильтруем ошибки о неопределённых функциях/константах WordPress
+								if msg_lower:match("undefined") then
+									for _, pattern in ipairs(wp_patterns) do
+										if diag.message:match(pattern) then
+											should_filter = true
+											break
+										end
+									end
+								end
+							end
+							if not should_filter then
+								table.insert(filtered, diag)
+							end
+						end
+						
+						-- Обновляем диагностику только если были отфильтрованы ошибки
+						if #filtered < #diagnostics then
+							vim.diagnostic.set(client.id, bufnr, filtered)
+						end
+					end,
+				})
+			end
+			
 			-- Форматирование по сохранению через LSP: только для C/.h по явному запросу
 			-- Остальные форматы отключены, чтобы не трогать Makefile, .clang-format и т.п.
 			if client.server_capabilities.documentFormattingProvider then
@@ -86,6 +131,52 @@ return {
 		nvim_lsp.pyright.setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
+		})
+
+		-- Настройка PHP LSP через PhpActor
+		-- Для лучшей поддержки WordPress рекомендуется установить WordPress stubs:
+		-- composer require --dev php-stubs/wordpress-stubs
+		-- Это поможет PhpActor понимать WordPress функции и константы
+		nvim_lsp.phpactor.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+			filetypes = { "php" },
+			cmd = { "phpactor", "language-server" },
+			root_dir = function(fname)
+				-- Сначала ищем composer.json, .git или composer.lock
+				local root = require("lspconfig.util").root_pattern("composer.json", ".git", "composer.lock")(fname)
+				if root then
+					return root
+				end
+				-- Для WordPress тем: ищем style.css или functions.php в корне темы
+				local wp_root = require("lspconfig.util").root_pattern("style.css", "functions.php")(fname)
+				if wp_root then
+					return wp_root
+				end
+				-- Если не найдено, используем директорию файла как корень
+				local dir = vim.fs.dirname(fname)
+				if dir and dir ~= "" then
+					return dir
+				end
+				-- В крайнем случае - текущая рабочая директория
+				return vim.fn.getcwd()
+			end,
+			init_options = {
+				["language_server_phpstan.enabled"] = false,
+				["language_server_psalm.enabled"] = false,
+			},
+			settings = {
+				phpactor = {
+					-- Настройки для работы с WordPress
+					completion = {
+						enabled = true,
+					},
+					-- Игнорируем некоторые ошибки, характерные для WordPress
+					diagnostics = {
+						enabled = true,
+					},
+				},
+			},
 		})
 
 		-- Настройка Rust LSP

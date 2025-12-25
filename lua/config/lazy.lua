@@ -25,7 +25,7 @@ require("lazy").setup("config.plugins")
 -- values shown are defaults and will be used if not provided
 require("gruvbox-material").setup({
 	background = {
-		transparent = true, -- set the background to be opaque
+		transparent = false, -- set the background to be opaque
 	},
 	float = {
 		force_background = true, -- set to true to force backgrounds on floats even when
