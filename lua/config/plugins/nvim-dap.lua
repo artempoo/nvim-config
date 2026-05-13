@@ -1,15 +1,96 @@
 return {
 	{
 		"mfussenegger/nvim-dap",
+		event = "VeryLazy",
 		dependencies = {
 			"rcarriga/nvim-dap-ui",
 			"nvim-neotest/nvim-nio",
+			"jay-babu/mason-nvim-dap.nvim",
+			"theHamsta/nvim-dap-virtual-text",
 		},
 		config = function()
+			local mason_dap = require("mason-nvim-dap")
 			local dap = require("dap")
 			local dapui = require("dapui")
+			local dap_virtual_text = require("nvim-dap-virtual-text")
 
-			-- Настройка DAP UI
+			dap_virtual_text.setup()
+
+			mason_dap.setup({
+				ensure_installed = { "codelldb", "cppdbg" },
+				automatic_installation = true,
+				handlers = {
+					function(config)
+						require("mason-nvim-dap").default_setup(config)
+					end,
+				},
+			})
+
+			-- Исполняемый файл: a.out или main в cwd — без запроса; иначе спросить путь
+			local function get_program()
+				local cwd = vim.fn.getcwd()
+				local candidates = { cwd .. "/a.out", cwd .. "/main" }
+				-- имя без расширения из текущего файла (main.c -> main)
+				local f = vim.api.nvim_buf_get_name(0)
+				if f and (f:match("%.c$") or f:match("%.cpp$")) then
+					local base = vim.fn.fnamemodify(f, ":t:r")
+					if base and base ~= "" then
+						table.insert(candidates, 2, cwd .. "/" .. base)
+					end
+				end
+				for _, path in ipairs(candidates) do
+					if vim.fn.filereadable(path) == 1 then
+						return path
+					end
+				end
+				return vim.fn.input("Path to executable: ", cwd .. "/", "file")
+			end
+			local configurations = {
+				{
+					name = "Launch (CodeLLDB)",
+					type = "codelldb",
+					request = "launch",
+					program = get_program,
+					cwd = "${workspaceFolder}",
+					stopOnEntry = false,
+					args = {},
+				},
+				{
+					name = "Launch (cppdbg)",
+					type = "cppdbg",
+					request = "launch",
+					program = get_program,
+					cwd = "${workspaceFolder}",
+					stopAtEntry = false,
+					MIMode = "lldb",
+				},
+				{
+					name = "Attach to lldbserver :1234",
+					type = "cppdbg",
+					request = "launch",
+					MIMode = "lldb",
+					miDebuggerServerAddress = "localhost:1234",
+					miDebuggerPath = "/usr/bin/lldb",
+					cwd = "${workspaceFolder}",
+					program = get_program,
+				},
+			}
+			dap.configurations.c = configurations
+			dap.configurations.cpp = configurations
+
+			-- Конфиг для текущего буфера: c/cpp или оба
+			local function get_configs()
+				local ft = vim.bo.filetype
+				local cfg = dap.configurations[ft]
+				if cfg and #cfg > 0 then
+					return cfg
+				end
+				-- файл не c/cpp — пробуем cpp и c
+				cfg = dap.configurations.cpp or dap.configurations.c
+				return cfg or {}
+			end
+
+			-- DAP UI (твой расклад: слева 4 панели, снизу REPL + консоль)
 			dapui.setup({
 				layouts = {
 					{
@@ -33,74 +114,34 @@ return {
 				},
 			})
 
-			-- Автоматическое открытие/закрытие UI
-			dap.listeners.after.event_initialized["dapui_config"] = dapui.open
+			vim.fn.sign_define("DapBreakpoint", { text = "🐞" })
+
+			dap.listeners.before.attach["dapui_config"] = dapui.open
+			dap.listeners.before.launch["dapui_config"] = dapui.open
 			dap.listeners.before.event_terminated["dapui_config"] = dapui.close
-			dap.listeners.before.event_exited["dapui_config"] = dapui.close
+			-- Не закрывать при выходе — успеешь прочитать сообщение. Закрыть: <Leader>dq
+			-- dap.listeners.before.event_exited["dapui_config"] = dapui.close
 
-			-- Настройка codelldb
-			dap.adapters.codelldb = {
-				type = "server",
-				port = "${port}",
-				executable = {
-					command = vim.fn.expand("~/.local/share/codelldb/extension/adapter/codelldb"),
-					args = { "--port", "${port}" },
-				},
-			}
-
-			-- Базовые конфигурации
-			dap.configurations.cpp = {
-				-- Конфигурация по умолчанию (без аргументов)
-				{
-					name = "Launch (no args)",
-					type = "codelldb",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-					end,
-					cwd = "${workspaceFolder}",
-					stopOnEntry = false,
-					args = {},
-				},
-				-- Конфигурация с фиксированными аргументами (пример: ./main -v text.txt)
-				{
-					name = "Launch (-v text.txt)",
-					type = "codelldb",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-					end,
-					cwd = "${workspaceFolder}",
-					stopOnEntry = false,
-					args = { "-v", "text.txt" },
-				},
-				-- Конфигурация с интерактивным вводом аргументов
-				{
-					name = "Launch (custom args)",
-					type = "codelldb",
-					request = "launch",
-					program = function()
-						return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
-					end,
-					cwd = "${workspaceFolder}",
-					stopOnEntry = false,
-					args = function()
-						local input = vim.fn.input("Program arguments (space separated): ")
-						return vim.split(input, " ")
-					end,
-				},
-			}
-			dap.configurations.c = dap.configurations.cpp
-
-			-- Горячие клавиши
+			-- Твои привязки клавиш
 			vim.keymap.set("n", "<F5>", function()
-				-- Показываем меню выбора конфигурации
-				require("dap").continue()
+				if dap.session() then
+					dap.continue()
+				else
+					local configs = get_configs()
+					if #configs > 0 then
+						dap.run(configs[1])
+					else
+						vim.notify("DAP: нет конфигурации для " .. vim.bo.filetype .. ". Открой .c/.cpp или установи cppdbg: MasonInstall cppdbg", vim.log.levels.WARN)
+					end
+				end
 			end)
 			vim.keymap.set("n", "<F6>", function()
-				-- Запуск с последней конфигурацией
-				local last_config = require("dap").configurations[vim.bo.filetype][1]
-				require("dap").run(last_config)
+				local configs = get_configs()
+				if #configs > 0 then
+					dap.run(configs[1])
+				else
+					vim.notify("DAP: нет конфигурации. Установи адаптер: :MasonInstall cppdbg", vim.log.levels.WARN)
+				end
 			end)
 			vim.keymap.set("n", "<F10>", function()
 				dap.step_over()
@@ -122,7 +163,7 @@ return {
 	{
 		"rcarriga/nvim-dap-ui",
 		config = function()
-			-- Инициализация будет выполнена в основном конфиге nvim-dap
+			-- Инициализация в основном конфиге nvim-dap
 		end,
 	},
 }

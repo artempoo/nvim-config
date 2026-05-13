@@ -11,7 +11,7 @@ return {
 			ensure_installed = {
 				"eslint_d",
 				"rust-analyzer",
-				"rustfmt",
+				"zls",
 				"jdtls",
 				"clangd",
 			},

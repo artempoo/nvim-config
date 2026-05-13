@@ -9,29 +9,46 @@ return {
 	},
 	config = function()
 		-- Конфигурация LSP
-		
+
 		local nvim_lsp = require("lspconfig")
 
 		local on_attach = function(client, bufnr)
 			-- защита: если bufnr не число, не вешаем автокоманды
-			if type(bufnr) ~= "number" then return end
-			
+			if type(bufnr) ~= "number" then
+				return
+			end
+
 			-- Отладочная информация для PHP
 			if client.name == "phpactor" then
-				vim.notify("PhpActor LSP подключен для PHP", vim.log.levels.INFO)
-				
+				vim.notify("PhpActor LSP подключен для PHP (bufnr: " .. bufnr .. ")", vim.log.levels.INFO)
+				vim.g.php_lsp_attached = true
+
 				-- Фильтрация диагностики для WordPress через автокоманду
 				vim.api.nvim_create_autocmd("DiagnosticChanged", {
 					buffer = bufnr,
 					callback = function()
 						local diagnostics = vim.diagnostic.get(bufnr, { client_id = client.id })
-						if #diagnostics == 0 then return end
-						
+						if #diagnostics == 0 then
+							return
+						end
+
 						local wp_patterns = {
-							"wp_", "get_", "the_", "is_", "has_", "add_", "remove_", "update_",
-							"register_", "unregister_", "do_", "apply_", "WP_", "ABSPATH",
+							"wp_",
+							"get_",
+							"the_",
+							"is_",
+							"has_",
+							"add_",
+							"remove_",
+							"update_",
+							"register_",
+							"unregister_",
+							"do_",
+							"apply_",
+							"WP_",
+							"ABSPATH",
 						}
-						
+
 						local filtered = {}
 						for _, diag in ipairs(diagnostics) do
 							local should_filter = false
@@ -51,7 +68,7 @@ return {
 								table.insert(filtered, diag)
 							end
 						end
-						
+
 						-- Обновляем диагностику только если были отфильтрованы ошибки
 						if #filtered < #diagnostics then
 							vim.diagnostic.set(client.id, bufnr, filtered)
@@ -59,7 +76,7 @@ return {
 					end,
 				})
 			end
-			
+
 			-- Форматирование по сохранению через LSP: только для C/.h по явному запросу
 			-- Остальные форматы отключены, чтобы не трогать Makefile, .clang-format и т.п.
 			if client.server_capabilities.documentFormattingProvider then
@@ -109,6 +126,11 @@ return {
 		})
 
 		nvim_lsp.cssls.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.gopls.setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
 		})
@@ -195,6 +217,16 @@ return {
 			},
 		})
 
+		-- Настройка Zig LSP
+		nvim_lsp.zls.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		-- nvim_lsp.mesonlsp.setup({
+		-- 	on_attach = on_attach,
+		-- 	capabilities = capabilities,
+		-- })
 	end,
 }
 

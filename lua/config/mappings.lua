@@ -6,6 +6,22 @@ vim.keymap.set("n", "<leader>fr", ":%s/")
 vim.keymap.set("n", "<leader>sl", ":LiveServerStart<CR>")
 vim.keymap.set("n", "<leader>sls", ":LiveServerStop<CR>")
 
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+
+vim.keymap.set("n", "<leader>t", ":belowright terminal zsh<CR>")
+
+-- Normal mode (одна строка)
+-- vim.keymap.set("n", "m,", ":m .+1<CR>", { silent = true, desc = "Move line down" })
+-- vim.keymap.set("n", "m.", ":m .-2<CR>", { silent = true, desc = "Move line up" })
+vim.keymap.set("n", "m,", ":<C-u>execute 'm .+' . v:count1<CR>==", { silent = true })
+vim.keymap.set("n", "m.", ":<C-u>execute 'm .-' . (v:count1 + 1)<CR>==", { silent = true })
+
+-- Visual mode (выделение)
+vim.keymap.set("v", "m,", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move selection down" })
+vim.keymap.set("v", "m.", ":m '<-2<CR>gv=gv", { silent = true, desc = "Move selection up" })
+
+vim.keymap.set("n", "P", "P`]", { silent = true, desc = "Paste & jump to end" })
+
 -- vim.keymap.set("n", "<leader>sg", ":split<CR>")
 -- vim.keymap.set("n", "<leader>sv", ":vsplit<CR>")
 vim.keymap.set("n", "<leader>te", ":tabedit<CR>")
@@ -17,25 +33,66 @@ vim.keymap.set("n", "sl", "<C-w>l")
 
 vim.keymap.set("n", "<TAB>t", ":tabnew:tabedit<CR>")
 
--- останавливаем и закрываем отладчик
-vim.keymap.set("n", "<Leader>dq", function()
-	-- 1. Остановить отладчик (если запущен)
-	pcall(require("dap").terminate)
+vim.keymap.set("v", "<leader>t", "y:lua run_translate()<CR>")
 
-	-- 2. Закрыть все окна DAP UI
+function run_translate()
+	local text = vim.fn.getreg('"')
+	local escaped = vim.fn.shellescape(text)
+	local result = vim.fn.system("trans -b " .. escaped)
+	print(result)
+end
+
+-- di( удалить аргументы между (...)
+-- vap - выделить блок с пробелом
+-- vap - выделить блок без пробела
+-- yap - копировать блок с пробелом
+-- yip - копировать блок без пробела
+
+local function move_line(direction)
+	local step = direction == "down" and "+1" or "-2"
+	vim.cmd("m ." .. step)
+end
+
+-- Закрыть DAP полностью: остановить отладчик, убрать все окна, оставить одно с кодом
+vim.keymap.set("n", "<Leader>dq", function()
+	pcall(require("dap").terminate)
 	pcall(require("dapui").close)
 
-	-- 3. Удалить "зависшие" буферы (DAP Console и др.)
-	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-		local buf_name = vim.api.nvim_buf_get_name(buf)
-		if buf_name:match("DAP") then
-			pcall(vim.api.nvim_buf_delete, buf, { force = true })
+	local function is_dap_buf(bufnr)
+		local name = vim.api.nvim_buf_get_name(bufnr)
+		return name and (name:match("DAP") or name:match("dap"))
+	end
+
+	-- Переключиться на первое окно с не-DAP буфером
+	local tab = vim.api.nvim_get_current_tabpage()
+	local wins = vim.api.nvim_tabpage_list_wins(tab)
+	local good_win
+	for _, w in ipairs(wins) do
+		local b = vim.api.nvim_win_get_buf(w)
+		if not is_dap_buf(b) then
+			good_win = w
+			break
+		end
+	end
+	if good_win and vim.api.nvim_get_current_win() ~= good_win then
+		vim.api.nvim_set_current_win(good_win)
+	end
+
+	-- Закрыть все окна с DAP-буферами
+	for _, w in ipairs(vim.api.nvim_tabpage_list_wins(tab)) do
+		if vim.api.nvim_win_is_valid(w) and is_dap_buf(vim.api.nvim_win_get_buf(w)) then
+			pcall(vim.api.nvim_win_close, w, true)
 		end
 	end
 
-	-- 4. Вернуться к исходному виду окон
+	-- Удалить DAP-буферы и оставить одно окно
+	for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+		if is_dap_buf(buf) then
+			pcall(vim.api.nvim_buf_delete, buf, { force = true })
+		end
+	end
 	vim.cmd("only")
-end, { desc = "[D]AP [Q]uit: Force close debugger UI" })
+end, { desc = "[D]AP [Q]uit: close all debugger UI" })
 
 -- Прервать отладку (аналог иконки №7 в REPL)
 vim.keymap.set("n", "<Leader>di", function()

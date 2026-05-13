@@ -63,3 +63,10 @@ vim.g.markdown_recommended_style = 0
 --   highlight Normal ctermbg=none
 --   highlight NonText ctermbg=none
 -- ]])
+vim.filetype.add({
+	filename = {
+		["meson.build"] = "meson",
+		["meson.options"] = "meson",
+		["meson_options.txt"] = "meson",
+	},
+})
