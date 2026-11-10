@@ -14,6 +14,8 @@ return {
 				"zls",
 				"jdtls",
 				"clangd",
+				"glsl_analyzer",
+				"tailwindcss-language-server",
 			},
 		})
 	end,

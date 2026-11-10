@@ -18,6 +18,11 @@ return {
 				return
 			end
 
+			-- Inlay hints для C/C++ (имена параметров при вызове функций)
+			if client.name == "clangd" and vim.lsp.inlay_hint then
+				vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+			end
+
 			-- Отладочная информация для PHP
 			if client.name == "phpactor" then
 				vim.notify("PhpActor LSP подключен для PHP (bufnr: " .. bufnr .. ")", vim.log.levels.INFO)
@@ -27,7 +32,8 @@ return {
 				vim.api.nvim_create_autocmd("DiagnosticChanged", {
 					buffer = bufnr,
 					callback = function()
-						local diagnostics = vim.diagnostic.get(bufnr, { client_id = client.id })
+						local namespace = vim.lsp.diagnostic.get_namespace(client.id)
+						local diagnostics = vim.diagnostic.get(bufnr, { namespace = namespace })
 						if #diagnostics == 0 then
 							return
 						end
@@ -71,26 +77,14 @@ return {
 
 						-- Обновляем диагностику только если были отфильтрованы ошибки
 						if #filtered < #diagnostics then
-							vim.diagnostic.set(client.id, bufnr, filtered)
+							vim.diagnostic.set(namespace, bufnr, filtered)
 						end
 					end,
 				})
 			end
 
-			-- Форматирование по сохранению через LSP: только для C/.h по явному запросу
-			-- Остальные форматы отключены, чтобы не трогать Makefile, .clang-format и т.п.
-			if client.server_capabilities.documentFormattingProvider then
-				local ft = vim.bo[bufnr].filetype
-				if ft == "c" or ft == "h" then
-					vim.api.nvim_create_autocmd("BufWritePre", {
-						group = vim.api.nvim_create_augroup("FormatCOnly", { clear = false }),
-						buffer = bufnr,
-						callback = function()
-							vim.lsp.buf.format({ bufnr = bufnr })
-						end,
-					})
-				end
-			end
+			-- Форматированием при сохранении управляет conform.nvim.
+			-- Отдельный LSP-обработчик здесь приводил к двойному форматированию C-файлов.
 		end
 
 		local capabilities = require("cmp_nvim_lsp").default_capabilities()
@@ -105,8 +99,12 @@ return {
 		nvim_lsp.clangd.setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
-			filetypes = { "c", "h" },
-			-- cmd = { "clangd", "--background-index" }, -- опционально
+			filetypes = { "c", "cpp", "h", "hpp" },
+			cmd = {
+				"clangd",
+				"--background-index",
+				"--enable-config",
+			},
 		})
 
 		nvim_lsp.emmet_ls.setup({
@@ -126,6 +124,11 @@ return {
 		})
 
 		nvim_lsp.cssls.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+		})
+
+		nvim_lsp.tailwindcss.setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
 		})
@@ -221,6 +224,17 @@ return {
 		nvim_lsp.zls.setup({
 			on_attach = on_attach,
 			capabilities = capabilities,
+		})
+
+		-- GLSL: автодополнение, hover-подсказки, goto-definition
+		nvim_lsp.glsl_analyzer.setup({
+			on_attach = on_attach,
+			capabilities = capabilities,
+			filetypes = { "glsl", "vert", "tesc", "tese", "frag", "geom", "comp" },
+			root_dir = function(fname)
+				return require("lspconfig.util").root_pattern(".git")(fname)
+					or vim.fs.dirname(fname)
+			end,
 		})
 
 		-- nvim_lsp.mesonlsp.setup({

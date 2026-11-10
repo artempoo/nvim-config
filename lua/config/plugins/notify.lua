@@ -2,7 +2,7 @@ return {
 	"rcarriga/nvim-notify",
 	priority = 1000,
 	opts = {
-		timeout = 12000,
+		timeout = 2500,
 		background_colour = "Normal",
 	},
 	config = function(_, opts)

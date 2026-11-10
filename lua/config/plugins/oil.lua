@@ -3,6 +3,9 @@ return {
 	dependencies = { "nvim-tree/nvim-web-devicons" },
 	config = function()
 		require("oil").setup({
+			keymaps = {
+				["q"] = { "actions.close", mode = "n" },
+			},
 			-- Использовать предпросмотр для файлов
 			preview = {
 				max_width = 0.9,
@@ -32,6 +35,12 @@ return {
 		})
 
 		-- Маппинги для oil.nvim
-		vim.keymap.set("n", "<leader>o", "<cmd>Oil<cr>", { desc = "Open Oil (file explorer)" })
+		vim.keymap.set("n", "<leader>o", function()
+			if vim.bo.filetype == "oil" then
+				require("oil.actions").close.callback()
+			else
+				require("oil").open()
+			end
+		end, { desc = "Toggle Oil file explorer" })
 	end,
 }

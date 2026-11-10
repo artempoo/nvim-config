@@ -22,7 +22,7 @@ o.smartindent = true -- Insert indents automatically
 o.splitbelow = true -- Put new windows below current
 o.splitright = true -- Put new windows right of current
 o.termguicolors = true -- True color support
-o.timeoutlen = 500 -- speed must be under 500ms inorder for keys to work, increase if you are not able to.
+o.timeoutlen = 300 -- Время ожидания продолжения комбинации клавиш
 o.undofile = true
 o.undolevels = 10000
 o.updatetime = 200 -- Save swap file and trigger CursorHold
@@ -68,5 +68,14 @@ vim.filetype.add({
 		["meson.build"] = "meson",
 		["meson.options"] = "meson",
 		["meson_options.txt"] = "meson",
+	},
+	extension = {
+		vert = "vert",
+		frag = "frag",
+		geom = "geom",
+		tesc = "tesc",
+		tese = "tese",
+		comp = "comp",
+		glsl = "glsl",
 	},
 })

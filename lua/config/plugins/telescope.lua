@@ -58,13 +58,13 @@ return {
 		-- keymap.set("n", "<leader>fb", function()
 		-- 	require("telescope.builtin").buffers()
 		-- end, { desc = "Find buffers" })
-		vim.keymap.set("n", "<leader>ps", function()
+		vim.keymap.set("n", "<leader>fs", function()
 			builtin.grep_string({ search = vim.fn.input("Grep > ") })
-		end)
+		end, { desc = "Search text in project" })
 		-- keymap.set("n", "<leader>fs", "<cmd>Telescope git<cr>", { desc = "Find string under cursor in cwd" })
 		-- keymap.set("n", "<leader>fc", "<cmd>Telescope git commits<cr>", { desc = "Find todos" })
 		-- keymap.set("n", "<leader>fh", builtin.help_tags, { desc = "Telescope help tags" })
-		keymap.set("n", "<leader>gr", builtin.lsp_references, { noremap = true, silent = true })
-		keymap.set("n", "<leader>gd", builtin.lsp_definitions, { noremap = true, silent = true })
+		keymap.set("n", "<leader>gr", builtin.lsp_references, { noremap = true, silent = true, desc = "Find LSP references" })
+		keymap.set("n", "<leader>gd", builtin.lsp_definitions, { noremap = true, silent = true, desc = "Find LSP definitions" })
 	end,
 }

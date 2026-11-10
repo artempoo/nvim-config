@@ -8,6 +8,13 @@ return {
 				winblend = 0, -- Прозрачность окна (0 = непрозрачно, 100 = полностью прозрачно)
 			},
 		},
+		picker = {
+			sources = {
+				explorer = {
+					hidden = true, -- показывать dotfiles (.gitignore, .clang-format и т.д.)
+				},
+			},
+		},
 	},
 	keys = {
 		{

@@ -1,6 +1,7 @@
 require("config.lazy")
 require("config.option")
 require("config.mappings")
+require("config.hotkeys")
 
 -- vim.cmd("syntax off");
 -- vim.wo.foldmethod = "manual" -- отключает автоматическое фолдинг
@@ -23,8 +24,6 @@ vim.api.nvim_create_autocmd({ "InsertEnter" }, {
 	end,
 })
 
--- Заглушаем только уведомления прогресса (это notification, не request)
-vim.lsp.handlers["$/progress"] = function() end
 vim.api.nvim_create_autocmd({ "InsertLeave" }, {
 	pattern = { "*.java" },
 	callback = function()

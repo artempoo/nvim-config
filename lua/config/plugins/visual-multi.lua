@@ -5,11 +5,13 @@ return {
 		init = function()
 			-- Через g:VM_maps (только Vimscript → корректный Dict): «курсор сюда» на пробел+m+m
 			vim.cmd([[
+				let g:VM_add_cursor_at_pos_no_mappings = 1
 				let g:VM_maps = get(g:, 'VM_maps', {})
 				if type(g:VM_maps) != v:t_dict
 					let g:VM_maps = {}
 				endif
 				let g:VM_maps['Add Cursor At Pos'] = '<leader>mm'
+				let g:VM_maps['Toggle Mappings'] = '<C-g>'
 			]])
 		end,
 		config = function()

@@ -6,15 +6,20 @@ return {
 		vim.opt.termguicolors = true
 
 		-- Маппинги для управления буферами
-		vim.api.nvim_set_keymap("n", "<TAB>l", ":BufferLineCloseLeft<CR>", { noremap = true, silent = true })
-		vim.api.nvim_set_keymap("n", "<TAB>r", ":BufferLineCloseRight<CR>", { noremap = true, silent = true })
-		vim.api.nvim_set_keymap("n", "<TAB>q", ":bd<CR>", { noremap = true, silent = true })
-		vim.api.nvim_set_keymap("n", "<TAB>w", ":BufferLineCycleNext<CR>", { noremap = true, silent = true })
+		vim.keymap.set("n", "<TAB>l", "<cmd>BufferLineCloseLeft<CR>", { silent = true, desc = "Close buffers to the left" })
+		vim.keymap.set("n", "<TAB>r", "<cmd>BufferLineCloseRight<CR>", { silent = true, desc = "Close buffers to the right" })
+		vim.keymap.set("n", "<TAB>q", "<cmd>bd<CR>", { silent = true, desc = "Close current buffer" })
+		vim.keymap.set("n", "<TAB>e", "<cmd>BufferLineCycleNext<CR>", { silent = true, desc = "Next buffer" })
+		vim.keymap.set("n", "<TAB>w", "<cmd>BufferLineCyclePrev<CR>", { silent = true, desc = "Previous buffer" })
 
 		require("bufferline").setup({
 			options = {
 				close_icon = "", -- Отступы вокруг иконки
 				show_close_icon = true,
+				indicator = {
+					icon = "▎",
+					style = "icon",
+				},
 				-- Доп. отступы для буферов:
 				offsets = {
 					{
@@ -36,13 +41,22 @@ return {
 					bold = true,
 				},
 				close_button_selected = {
-					fg = "#fb4934", -- Красный крестик для активного буфера
-					bg = "NONE",
+					fg = "#E49B5D",
+					bg = "#403A36",
 					bold = true,
 				},
 				buffer_selected = {
-					fg = "#fb4934", -- Красный текст для активного буфера
+					fg = "#ECE1D7",
+					bg = "#403A36",
 					bold = true,
+				},
+				indicator_selected = {
+					fg = "#E49B5D",
+					bg = "#403A36",
+				},
+				separator_selected = {
+					fg = "#403A36",
+					bg = "#403A36",
 				},
 			},
 		})
@@ -50,17 +64,23 @@ return {
 		-- Принудительно устанавливаем highlight для активного буфера
 		-- Используем автокоманду для переопределения после загрузки цветовой схемы
 		local function update_selected_highlight()
-			-- Красный крестик для активного буфера
 			vim.api.nvim_set_hl(0, "BufferLineCloseButtonSelected", {
-				fg = "#fb4934",
-				bg = "NONE",
+				fg = "#E49B5D",
+				bg = "#403A36",
 				bold = true,
 			})
-			-- Красный текст для активного буфера
 			vim.api.nvim_set_hl(0, "BufferLineBufferSelected", {
-				fg = "#fb4934",
-				bg = "NONE",
+				fg = "#ECE1D7",
+				bg = "#403A36",
 				bold = true,
+			})
+			vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", {
+				fg = "#E49B5D",
+				bg = "#403A36",
+			})
+			vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", {
+				fg = "#403A36",
+				bg = "#403A36",
 			})
 		end
 

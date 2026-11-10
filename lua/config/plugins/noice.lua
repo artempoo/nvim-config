@@ -31,7 +31,5 @@ return {
 				} }, opts = { skip = true } },
 			},
 		})
-
-		print("Noice loaded (basic config)")
 	end,
-} 
+}

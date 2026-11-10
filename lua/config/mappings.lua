@@ -2,19 +2,19 @@
 -- Маппинги настроены в lua/config/plugins/snacks-explorer.lua
 -- vim.keymap.set("n", "<leader>sp", ":vsplit<CR>")
 -- vim.keymap.set("n", "<leader>on", ":only<CR>")
-vim.keymap.set("n", "<leader>fr", ":%s/")
-vim.keymap.set("n", "<leader>sl", ":LiveServerStart<CR>")
-vim.keymap.set("n", "<leader>sls", ":LiveServerStop<CR>")
+vim.keymap.set("n", "<leader>fr", ":%s/", { desc = "Replace in current file" })
+vim.keymap.set("n", "<leader>sl", ":LiveServerStart<CR>", { desc = "Start Live Server" })
+vim.keymap.set("n", "<leader>sls", ":LiveServerStop<CR>", { desc = "Stop Live Server" })
 
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true, desc = "Leave terminal mode" })
 
-vim.keymap.set("n", "<leader>t", ":belowright terminal zsh<CR>")
+vim.keymap.set("n", "<leader>t", ":belowright terminal zsh<CR>", { desc = "Open terminal" })
 
 -- Normal mode (одна строка)
 -- vim.keymap.set("n", "m,", ":m .+1<CR>", { silent = true, desc = "Move line down" })
 -- vim.keymap.set("n", "m.", ":m .-2<CR>", { silent = true, desc = "Move line up" })
-vim.keymap.set("n", "m,", ":<C-u>execute 'm .+' . v:count1<CR>==", { silent = true })
-vim.keymap.set("n", "m.", ":<C-u>execute 'm .-' . (v:count1 + 1)<CR>==", { silent = true })
+vim.keymap.set("n", "m,", ":<C-u>execute 'm .+' . v:count1<CR>==", { silent = true, desc = "Move line down" })
+vim.keymap.set("n", "m.", ":<C-u>execute 'm .-' . (v:count1 + 1)<CR>==", { silent = true, desc = "Move line up" })
 
 -- Visual mode (выделение)
 vim.keymap.set("v", "m,", ":m '>+1<CR>gv=gv", { silent = true, desc = "Move selection down" })
@@ -24,23 +24,18 @@ vim.keymap.set("n", "P", "P`]", { silent = true, desc = "Paste & jump to end" })
 
 -- vim.keymap.set("n", "<leader>sg", ":split<CR>")
 -- vim.keymap.set("n", "<leader>sv", ":vsplit<CR>")
-vim.keymap.set("n", "<leader>te", ":tabedit<CR>")
+vim.keymap.set("n", "<leader>te", ":tabedit<CR>", { desc = "Open new tab" })
 
-vim.keymap.set("n", "sh", "<C-w>h")
-vim.keymap.set("n", "sk", "<C-w>k")
-vim.keymap.set("n", "sj", "<C-w>j")
-vim.keymap.set("n", "sl", "<C-w>l")
+vim.keymap.set("n", "sh", "<C-w>h", { desc = "Focus window left" })
+vim.keymap.set("n", "sk", "<C-w>k", { desc = "Focus window above" })
+vim.keymap.set("n", "sj", "<C-w>j", { desc = "Focus window below" })
+vim.keymap.set("n", "sl", "<C-w>l", { desc = "Focus window right" })
 
-vim.keymap.set("n", "<TAB>t", ":tabnew:tabedit<CR>")
+vim.keymap.set("n", "<TAB>t", ":tabnew:tabedit<CR>", { desc = "Open new tab" })
 
-vim.keymap.set("v", "<leader>t", "y:lua run_translate()<CR>")
-
-function run_translate()
-	local text = vim.fn.getreg('"')
-	local escaped = vim.fn.shellescape(text)
-	local result = vim.fn.system("trans -b " .. escaped)
-	print(result)
-end
+vim.keymap.set("x", "<leader>t", function()
+	require("config.translate").translate_visual()
+end, { desc = "Translate selection" })
 
 -- di( удалить аргументы между (...)
 -- vap - выделить блок с пробелом
@@ -250,7 +245,7 @@ end, { desc = "Test LSP completion" })
 vim.keymap.set("n", "<leader>ts", function()
 	local word = vim.fn.expand("<cword>")
 	local url = "https://learn.javascript.ru/search?query=" .. word
-	vim.fn.system("open '" .. url .. "'")
+	vim.fn.system({ "open", url })
 end, { desc = "Search learn.javascript.ru documentation" })
 
 -- Java build: автоопределение Gradle/Maven/javac и запуск :make с quickfix

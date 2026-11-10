@@ -8,6 +8,17 @@ return {
 	config = function()
 		local treesitter = require("nvim-treesitter.configs")
 
+		-- Шейдерные filetype'ы (vert/frag/...) → парсер glsl
+		vim.treesitter.language.register("glsl", {
+			"glsl",
+			"vert",
+			"frag",
+			"geom",
+			"tesc",
+			"tese",
+			"comp",
+		})
+
 		treesitter.setup({
 			highlight = {
 				enable = true,
@@ -46,16 +57,13 @@ return {
 				"php",
 				"python",
 				"sql",
+				"glsl",
 				--	"asm", -- Общий ассемблер (GAS, NASM)
 				--	"nasm", -- Если используете NASM (раскомментируйте)
 				--	"masm", -- Если используете MASM (раскомментируйте)
 			},
 			auto_install = true,
 			sync_install = false,
-			context_commentstring = {
-				enable = true,
-				enable_autocmd = false,
-			},
 		})
 
 		-- Автоматически устанавливаем filetype для .asm и .s файлов
