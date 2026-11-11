@@ -5,7 +5,5 @@ return {
 		require("onedark").setup({
 			style = "darker",
 		})
-		-- Enable theme
-		require("onedark").load()
 	end,
 }

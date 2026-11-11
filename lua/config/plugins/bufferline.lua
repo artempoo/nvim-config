@@ -41,22 +41,22 @@ return {
 					bold = true,
 				},
 				close_button_selected = {
-					fg = "#E49B5D",
-					bg = "#403A36",
+					fg = "#0969DA",
+					bg = "#DDF4FF",
 					bold = true,
 				},
 				buffer_selected = {
-					fg = "#ECE1D7",
-					bg = "#403A36",
+					fg = "#24292F",
+					bg = "#DDF4FF",
 					bold = true,
 				},
 				indicator_selected = {
-					fg = "#E49B5D",
-					bg = "#403A36",
+					fg = "#0969DA",
+					bg = "#DDF4FF",
 				},
 				separator_selected = {
-					fg = "#403A36",
-					bg = "#403A36",
+					fg = "#DDF4FF",
+					bg = "#DDF4FF",
 				},
 			},
 		})
@@ -65,22 +65,22 @@ return {
 		-- Используем автокоманду для переопределения после загрузки цветовой схемы
 		local function update_selected_highlight()
 			vim.api.nvim_set_hl(0, "BufferLineCloseButtonSelected", {
-				fg = "#E49B5D",
-				bg = "#403A36",
+				fg = "#0969DA",
+				bg = "#DDF4FF",
 				bold = true,
 			})
 			vim.api.nvim_set_hl(0, "BufferLineBufferSelected", {
-				fg = "#ECE1D7",
-				bg = "#403A36",
+				fg = "#24292F",
+				bg = "#DDF4FF",
 				bold = true,
 			})
 			vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", {
-				fg = "#E49B5D",
-				bg = "#403A36",
+				fg = "#0969DA",
+				bg = "#DDF4FF",
 			})
 			vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", {
-				fg = "#403A36",
-				bg = "#403A36",
+				fg = "#DDF4FF",
+				bg = "#DDF4FF",
 			})
 		end
 

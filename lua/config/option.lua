@@ -10,6 +10,7 @@ o.number = true -- номер строки перед каждой строко�
 o.pumblend = 10 -- Popup blend
 o.pumheight = 10 -- Maximum number of entries in a popup
 o.relativenumber = true -- Relative line numbers
+o.statuscolumn = "%s %=%{v:relnum == 0 ? v:lnum : v:relnum}  " -- Отступ между номерами строк и кодом
 o.shiftround = true -- Round indent
 o.shiftwidth = 2 -- Size of an indent
 o.tabstop = 2
