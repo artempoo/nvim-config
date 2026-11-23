@@ -50,9 +50,6 @@ return {
 			pattern = "snacks_explorer",
 			callback = function()
 				vim.wo.winblend = 0 -- Убираем прозрачность
-				-- Убираем фон, если он установлен
-				vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
-				vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
 
 				-- Навигация: переключение между полем поиска и списком файлов
 				-- Попробуем разные варианты навигации

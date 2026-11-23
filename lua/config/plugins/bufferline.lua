@@ -12,84 +12,42 @@ return {
 		vim.keymap.set("n", "<TAB>e", "<cmd>BufferLineCycleNext<CR>", { silent = true, desc = "Next buffer" })
 		vim.keymap.set("n", "<TAB>w", "<cmd>BufferLineCyclePrev<CR>", { silent = true, desc = "Previous buffer" })
 
-		require("bufferline").setup({
-			options = {
-				close_icon = "", -- Отступы вокруг иконки
-				show_close_icon = true,
-				indicator = {
-					icon = "▎",
-					style = "icon",
-				},
-				-- Доп. отступы для буферов:
-				offsets = {
-					{
-						filetype = "NvimTree",
-						text = "File Explorer",
-						padding = 8, -- Косвенно влияет на отступы
+		local function setup_bufferline()
+			local theme_highlights = require("config.theme").get("bufferline")
+			if not theme_highlights then
+				-- Bufferline groups are not cleared by every colorscheme, so remove
+				-- cached colors before asking it to derive the active theme again.
+				for _, group in ipairs(vim.fn.getcompletion("BufferLine", "highlight")) do
+					vim.api.nvim_set_hl(0, group, {})
+				end
+			end
+
+			require("bufferline").setup({
+				options = {
+					themable = false,
+					close_icon = "", -- Отступы вокруг иконки
+					show_close_icon = true,
+					indicator = {
+						icon = "▎",
+						style = "icon",
+					},
+					-- Доп. отступы для буферов:
+					offsets = {
+						{
+							filetype = "NvimTree",
+							text = "File Explorer",
+							padding = 8, -- Косвенно влияет на отступы
+						},
 					},
 				},
-			},
-			highlights = {
-				close_button = {
-					fg = "#e0def4",
-					bg = "NONE",
-					bold = true,
-				},
-				close_button_visible = {
-					fg = "#eb6f92",
-					bg = "NONE",
-					bold = true,
-				},
-				close_button_selected = {
-					fg = "#0969DA",
-					bg = "#DDF4FF",
-					bold = true,
-				},
-				buffer_selected = {
-					fg = "#24292F",
-					bg = "#DDF4FF",
-					bold = true,
-				},
-				indicator_selected = {
-					fg = "#0969DA",
-					bg = "#DDF4FF",
-				},
-				separator_selected = {
-					fg = "#DDF4FF",
-					bg = "#DDF4FF",
-				},
-			},
-		})
-
-		-- Принудительно устанавливаем highlight для активного буфера
-		-- Используем автокоманду для переопределения после загрузки цветовой схемы
-		local function update_selected_highlight()
-			vim.api.nvim_set_hl(0, "BufferLineCloseButtonSelected", {
-				fg = "#0969DA",
-				bg = "#DDF4FF",
-				bold = true,
-			})
-			vim.api.nvim_set_hl(0, "BufferLineBufferSelected", {
-				fg = "#24292F",
-				bg = "#DDF4FF",
-				bold = true,
-			})
-			vim.api.nvim_set_hl(0, "BufferLineIndicatorSelected", {
-				fg = "#0969DA",
-				bg = "#DDF4FF",
-			})
-			vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", {
-				fg = "#DDF4FF",
-				bg = "#DDF4FF",
+				highlights = theme_highlights,
 			})
 		end
 
-		-- Применяем сразу и после загрузки цветовой схемы
-		vim.defer_fn(update_selected_highlight, 100)
+		setup_bufferline()
 		vim.api.nvim_create_autocmd("ColorScheme", {
-			pattern = "*",
 			callback = function()
-				vim.defer_fn(update_selected_highlight, 100)
+				vim.schedule(setup_bufferline)
 			end,
 		})
 	end,

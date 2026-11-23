@@ -88,13 +88,8 @@ local function start_wait_notification(direction)
 	end
 end
 
-local function show_result(source, translation, selection, direction)
-	local lines = { "ИСХОДНЫЙ ТЕКСТ", "" }
-	vim.list_extend(lines, split_lines(source))
-	table.insert(lines, "")
-	local translation_heading = #lines
-	table.insert(lines, "ПЕРЕВОД · " .. direction)
-	table.insert(lines, "")
+local function show_result(translation, selection, direction)
+	local lines = { "ПЕРЕВОД · " .. direction, "" }
 	vim.list_extend(lines, split_lines(translation))
 	table.insert(lines, "")
 	table.insert(lines, "Y — копировать перевод · Enter — заменить выделение · q/Esc — закрыть")
@@ -129,7 +124,6 @@ local function show_result(source, translation, selection, direction)
 
 	local namespace = vim.api.nvim_create_namespace("translation_window")
 	vim.api.nvim_buf_add_highlight(bufnr, namespace, "Title", 0, 0, -1)
-	vim.api.nvim_buf_add_highlight(bufnr, namespace, "Title", translation_heading, 0, -1)
 	vim.api.nvim_buf_add_highlight(bufnr, namespace, "Comment", #lines - 1, 0, -1)
 
 	local close = function()
@@ -148,17 +142,23 @@ local function show_result(source, translation, selection, direction)
 		end
 
 		local replacement = split_lines(translation)
+		if selection.mode == "V" then
+			vim.api.nvim_buf_set_lines(
+				selection.bufnr,
+				selection.start_row,
+				selection.end_row + 1,
+				false,
+				replacement
+			)
+			close()
+			return
+		end
+
 		local end_row = selection.end_row
 		local end_col = selection.end_col
-		if selection.mode == "V" then
-			selection.start_col = 0
-			end_row = end_row + 1
-			end_col = 0
-		else
-			local end_line = vim.api.nvim_buf_get_lines(selection.bufnr, end_row, end_row + 1, false)[1] or ""
-			local char = end_line:sub(end_col + 1):match("^.[\128-\191]*") or ""
-			end_col = end_col + #char
-		end
+		local end_line = vim.api.nvim_buf_get_lines(selection.bufnr, end_row, end_row + 1, false)[1] or ""
+		local char = end_line:sub(end_col + 1):match("^.[\128-\191]*") or ""
+		end_col = end_col + #char
 
 		vim.api.nvim_buf_set_text(
 			selection.bufnr,
@@ -196,35 +196,27 @@ function M.translate_visual()
 	}
 	local target_language, direction = detect_direction(source)
 	local finish_wait = start_wait_notification(direction)
+	local profile = require("config.profile")
+	local command = "exec tl -t " .. vim.fn.shellescape(target_language)
+	local shell_command = { profile.shell }
+	vim.list_extend(shell_command, profile.shell_login_args)
+	table.insert(shell_command, command)
 
-	local engines = { "google", "bing" }
-	local errors = {}
+	vim.system(shell_command, { text = true, stdin = source }, function(result)
+		local translation = clean_text(result.stdout or "")
 
-	local function run_translation(index)
-		local engine = engines[index]
-		vim.system({ "trans", "-b", "-e", engine, ":" .. target_language, source }, { text = true }, function(result)
-			local translation = clean_text(result.stdout or "")
+		vim.schedule(function()
 			if result.code ~= 0 or translation == "" then
-				local message = clean_error(result.stderr or "")
-				table.insert(errors, engine .. ": " .. (message ~= "" and message or "нет ответа"))
-				if index < #engines then
-					run_translation(index + 1)
-					return
-				end
+				local error_output = result.stderr ~= "" and result.stderr or result.stdout
+				local message = clean_error(error_output or "")
+				finish_wait(false, message ~= "" and message or "tl не вернул перевод")
+				return
 			end
 
-			vim.schedule(function()
-				if result.code ~= 0 or translation == "" then
-					finish_wait(false, table.concat(errors, " · "))
-					return
-				end
-				finish_wait(true, "Перевод готов · " .. engine)
-				show_result(source, translation, selection, direction)
-			end)
+			finish_wait(true, "Перевод готов · Yandex")
+			show_result(translation, selection, direction)
 		end)
-	end
-
-	run_translation(1)
+	end)
 end
 
 return M

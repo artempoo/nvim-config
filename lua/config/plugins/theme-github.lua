@@ -1,11 +1,13 @@
 return {
 	"projekt0n/github-nvim-theme",
 	name = "github-theme",
+	enabled = require("config.profile").theme == "github",
 	lazy = false,
-	priority = 1000,
+	priority = 1100,
 	config = function()
 		vim.opt.termguicolors = true
 		vim.opt.background = "light"
+		local theme = require("config.theme")
 
 		-- Keep GitHub Light configured below so it is easy to restore, but use
 		-- Neovim's restrained built-in light theme for now.
@@ -31,12 +33,64 @@ return {
 			},
 		})
 
+		local palette = {
+			strong = "#0D1117",
+			ink = "#24292F",
+			soft = "#4B535D",
+			muted = "#8C959F",
+			pink = "#BD4F7A",
+			line_number = "#B8C0C8",
+			line_number_current = "#6E7781",
+			indent = "#E1E4E8",
+			indent_scope = "#C8CDD2",
+			buffer_accent = "#0969DA",
+			buffer_background = "#DDF4FF",
+			close = "#E0DEF4",
+			close_visible = "#EB6F92",
+		}
+
+		theme.set("github_light_default", {
+			notify_background = "#FFFFFF",
+			lualine = {
+				normal = {
+					a = { fg = palette.ink, bg = "NONE", gui = "bold" },
+					b = { fg = palette.line_number_current, bg = "NONE" },
+					c = { fg = palette.line_number_current, bg = "NONE" },
+				},
+				insert = { a = { fg = palette.ink, bg = "NONE", gui = "bold" } },
+				visual = { a = { fg = palette.pink, bg = "NONE", gui = "bold" } },
+				replace = { a = { fg = palette.ink, bg = "NONE", gui = "bold" } },
+				command = { a = { fg = palette.ink, bg = "NONE", gui = "bold" } },
+				inactive = {
+					a = { fg = palette.muted, bg = "NONE" },
+					b = { fg = palette.muted, bg = "NONE" },
+					c = { fg = palette.muted, bg = "NONE" },
+				},
+			},
+			bufferline = {
+				close_button = { fg = palette.close, bg = "NONE", bold = true },
+				close_button_visible = { fg = palette.close_visible, bg = "NONE", bold = true },
+				close_button_selected = {
+					fg = palette.buffer_accent,
+					bg = palette.buffer_background,
+					bold = true,
+				},
+				buffer_selected = { fg = palette.ink, bg = palette.buffer_background, bold = true },
+				indicator_selected = { fg = palette.buffer_accent, bg = palette.buffer_background },
+				separator_selected = { fg = palette.buffer_background, bg = palette.buffer_background },
+			},
+		})
+
 		local function make_monochrome()
-			local strong = "#0D1117"
-			local ink = "#24292F"
-			local soft = "#4B535D"
-			local muted = "#8C959F"
-			local purple = "#6F5A8A"
+			if vim.g.colors_name ~= "github_light_default" then
+				return
+			end
+
+			local strong = palette.strong
+			local ink = palette.ink
+			local soft = palette.soft
+			local muted = palette.muted
+			local pink = palette.pink
 			local strong_groups = {
 				Function = true,
 				Tag = true,
@@ -71,7 +125,7 @@ return {
 			}
 
 			for _, group in ipairs(syntax_groups) do
-				local color = purple_groups[group] and purple
+				local color = purple_groups[group] and pink
 					or (strong_groups[group] and strong or (soft_groups[group] and soft or ink))
 				vim.api.nvim_set_hl(0, group, { fg = color, bold = false })
 			end
@@ -104,7 +158,7 @@ return {
 						or lower_name:find("operator", 1, true)
 						or lower_name:find("punctuation", 1, true)
 					resolved.fg = is_comment and muted
-						or (is_purple and purple or (is_strong and strong or (is_soft and soft or ink)))
+						or (is_purple and pink or (is_strong and strong or (is_soft and soft or ink)))
 					resolved.bold = false
 					resolved.italic = is_comment
 					resolved.link = nil
@@ -114,10 +168,17 @@ return {
 
 			vim.api.nvim_set_hl(0, "Comment", { fg = muted, italic = true })
 			vim.api.nvim_set_hl(0, "SpecialComment", { fg = muted, italic = true })
-			vim.api.nvim_set_hl(0, "LineNr", { fg = "#B8C0C8" })
-			vim.api.nvim_set_hl(0, "LineNrAbove", { fg = "#B8C0C8" })
-			vim.api.nvim_set_hl(0, "LineNrBelow", { fg = "#B8C0C8" })
-			vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#6E7781", bold = false })
+			vim.api.nvim_set_hl(0, "LineNr", { fg = palette.line_number })
+			vim.api.nvim_set_hl(0, "LineNrAbove", { fg = palette.line_number })
+			vim.api.nvim_set_hl(0, "LineNrBelow", { fg = palette.line_number })
+			vim.api.nvim_set_hl(0, "CursorLineNr", { fg = palette.line_number_current, bold = false })
+			vim.api.nvim_set_hl(0, "IblIndent", { fg = palette.indent, bold = false })
+			vim.api.nvim_set_hl(0, "IblScope", { fg = palette.indent_scope, bold = false })
+			vim.api.nvim_set_hl(0, "MiniIndentscopeSymbol", { fg = palette.indent_scope, bold = false })
+			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "FloatBorder", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "StatusLine", { bg = "NONE" })
+			vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "NONE" })
 		end
 
 		vim.api.nvim_create_autocmd("ColorScheme", {

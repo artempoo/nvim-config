@@ -56,6 +56,7 @@ local sections = {
 	{ "JAVA И GIT",
 		{ "<Space>jb", "Собрать Java-проект с quickfix" },
 		{ "<Space>jB", "Собрать Java-проект в терминале" },
+		{ "<Space>gg", "Открыть Git-клиент Neogit" },
 		{ "<Space>gl", "Показать граф Git" },
 	},
 }

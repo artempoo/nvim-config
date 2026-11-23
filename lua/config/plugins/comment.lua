@@ -11,6 +11,10 @@ return {
 	config = function()
 		require("ts_context_commentstring").setup({
 			enable_autocmd = false,
+			languages = {
+				c = { __default = "// %s", __multiline = "// %s" },
+				cpp = { __default = "// %s", __multiline = "// %s" },
+			},
 		})
 
 		require("Comment").setup({

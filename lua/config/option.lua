@@ -1,5 +1,6 @@
 local global = vim.g
 local o = vim.opt
+local profile = require("config.profile")
 
 o.confirm = true -- Confirm to save changes before exiting modified buffer
 o.cursorline = true -- Enable highlighting of the current line
@@ -34,6 +35,8 @@ o.title = true
 o.showmatch = true
 o.clipboard = "unnamedplus" -- использование системного буфера
 o.sessionoptions = { "buffers", "curdir", "tabpages", "winsize" }
+o.cmdheight = 0 -- Показывать командную строку только когда она используется
+o.shell = profile.shell
 
 -- vim.wo.number = true
 -- vim.opt.hlsearch = true

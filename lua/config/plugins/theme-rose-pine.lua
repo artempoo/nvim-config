@@ -1,8 +1,11 @@
 return {
 	"rose-pine/neovim",
 	name = "rose-pine",
-	priority = 1000,
+	enabled = require("config.profile").theme == "rose-pine",
+	lazy = false,
+	priority = 1100,
 	config = function()
+		vim.opt.background = "dark"
 		require("rose-pine").setup({
 			variant = "moon", -- auto, main, moon, or dawn
 			dark_variant = "main", -- main, moon, or dawn
@@ -76,5 +79,6 @@ return {
 			end,
 		})
 
+		vim.cmd.colorscheme("rose-pine")
 	end,
 }

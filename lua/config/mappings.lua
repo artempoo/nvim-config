@@ -8,7 +8,7 @@ vim.keymap.set("n", "<leader>sls", ":LiveServerStop<CR>", { desc = "Stop Live Se
 
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true, silent = true, desc = "Leave terminal mode" })
 
-vim.keymap.set("n", "<leader>t", ":belowright terminal zsh<CR>", { desc = "Open terminal" })
+vim.keymap.set("n", "<leader>t", ":belowright terminal<CR>", { desc = "Open terminal" })
 
 -- Normal mode (одна строка)
 -- vim.keymap.set("n", "m,", ":m .+1<CR>", { silent = true, desc = "Move line down" })
@@ -245,7 +245,7 @@ end, { desc = "Test LSP completion" })
 vim.keymap.set("n", "<leader>ts", function()
 	local word = vim.fn.expand("<cword>")
 	local url = "https://learn.javascript.ru/search?query=" .. word
-	vim.fn.system({ "open", url })
+	vim.fn.system({ require("config.profile").open_command, url })
 end, { desc = "Search learn.javascript.ru documentation" })
 
 -- Java build: автоопределение Gradle/Maven/javac и запуск :make с quickfix
